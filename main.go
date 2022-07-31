@@ -1,27 +1,27 @@
 package main
 
 import (
-	"crypto/rand"
-	"encoding/base64"
-	"flag"
-	"fmt"
-	"io"
-	"log"
-	"net/url"
-	"os"
-	"os/signal"
-	"strings"
-	"syscall"
-	"time"
+	"crypto/rand"   //and包实现了用于加解密的更安全的随机数生成器
+	"encoding/base64"  //base64
+	"flag" //命令行读取
+	"fmt" //打印
+	"io" //文件读取
+	"log" //日志
+	"net/url" //网络请求
+	"os" //系统
+	"os/signal" //
+	"strings" //字符串
+	"syscall" //系统
+	"time"  //时间
 
-	"github.com/shadowsocks/go-shadowsocks2/core"
-	"github.com/shadowsocks/go-shadowsocks2/socks"
+	"github.com/shadowsocks/go-shadowsocks2/core" // tcpRemote
+	"github.com/shadowsocks/go-shadowsocks2/socks"  // tcpRemote
 )
 
-var config struct {
-	Verbose    bool
-	UDPTimeout time.Duration
-	TCPCork    bool
+var config struct { //配置
+	Verbose    bool  //继承
+	UDPTimeout time.Duration //超市时间
+	TCPCork    bool //
 }
 
 func main() {
@@ -73,21 +73,21 @@ func main() {
 		return
 	}
 
-	if flags.Client == "" && flags.Server == "" {
+	if flags.Client == "" && flags.Server == "" {//如过 client 是空的 并且 服务器是空的 就返回
 		flag.Usage()
 		return
 	}
 
 	var key []byte
 	if flags.Key != "" {
-		k, err := base64.URLEncoding.DecodeString(flags.Key)
+		k, err := base64.URLEncoding.DecodeString(flags.Key) //密钥
 		if err != nil {
 			log.Fatal(err)
 		}
 		key = k
 	}
 
-	if flags.Client != "" { // client mode
+	if flags.Client != "" { // client mode  //客户端模式
 		addr := flags.Client
 		cipher := flags.Cipher
 		password := flags.Password
@@ -145,14 +145,14 @@ func main() {
 		}
 	}
 
-	if flags.Server != "" { // server mode
+	if flags.Server != "" { // server mode 服务端模式
 		addr := flags.Server
 		cipher := flags.Cipher
 		password := flags.Password
 		var err error
 
-		if strings.HasPrefix(addr, "ss://") {
-			addr, cipher, password, err = parseURL(addr)
+		if strings.HasPrefix(addr, "ss://") { //走的ss协议
+			addr, cipher, password, err = parseURL(addr) //从地址解析出 地址 密钥 密码
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -160,7 +160,7 @@ func main() {
 
 		udpAddr := addr
 
-		if flags.Plugin != "" {
+		if flags.Plugin != "" {//
 			addr, err = startPlugin(flags.Plugin, flags.PluginOpts, addr, true)
 			if err != nil {
 				log.Fatal(err)
@@ -176,7 +176,7 @@ func main() {
 			go udpRemote(udpAddr, ciph.PacketConn)
 		}
 		if flags.TCP {
-			go tcpRemote(addr, ciph.StreamConn)
+			go tcpRemote(addr, ciph.StreamConn)//真正的主因
 		}
 	}
 
